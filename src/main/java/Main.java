@@ -52,8 +52,8 @@ public class Main {
             System.out.println("Done");
             String defHtml = html.toString();
 
-            Pattern mention = Pattern.compile("([@][A-z]+)");
-            Pattern hashtag = Pattern.compile("([#][A-z]+)");
+            Pattern mention = Pattern.compile("([@][A-z]{5,})");
+            Pattern hashtag = Pattern.compile("([#][A-z]{5,})");
             Pattern name = Pattern.compile("^([A-Z][a-z]+([ ]?[a-z]?['-]?[A-Z][a-z]+)*)$");
             Pattern account = Pattern.compile("(https?:\\/\\/)?(www\\.)?twitter\\.com\\/[A-Za-z0-9_]{5,15}(\\?(\\w+=\\w+&?)*)?");
             java.util.List<Pattern> asd = List.of(mention, hashtag, name, account).asJava();
