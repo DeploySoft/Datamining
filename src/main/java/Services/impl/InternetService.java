@@ -15,7 +15,8 @@ public class InternetService implements ISourceService {
     public InternetService() {
     }
 
-    public Optional<String> getWebPage(String url) {
+    @Override
+    public Optional<String> dataFromSource(String url) {
         try {
             LOG.info("Starting read " + url);
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -40,7 +41,8 @@ public class InternetService implements ISourceService {
         }
     }
 
-    private boolean isRedirect(boolean redirect, int status) {
+    @Override
+    public boolean isRedirect(boolean redirect, int status) {
         if (status != HttpURLConnection.HTTP_OK) {
             if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_SEE_OTHER)
                 redirect = true;

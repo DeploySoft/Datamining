@@ -23,15 +23,6 @@ public class PatternsDelegate {
         this.propertiesConfig = propertiesConfig;
     }
 
-
-    public PatternsDelegate() {
-
-    }
-
-    public static void main(String[] args) {
-        new PatternsDelegate().validateData("123");
-    }
-
     private List<HashMap<String, Pattern>> getDefaultPatterns() {
         return List.of(
                 HashMap.of("mention", Pattern.compile("([@][A-z]{5,})")),
@@ -40,16 +31,10 @@ public class PatternsDelegate {
                 HashMap.of("account", Pattern.compile("(https?:\\/\\/)?(www\\.)?twitter\\.com\\/[A-Za-z0-9_]{5,15}(\\?(\\w+=\\w+&?)*)?")));
     }
 
-    public List<HashMap<String, Pattern>> getAdditionalPatterns() {
-//    todo read here new patterns
-        return null;
-    }
 
-
-    public List<Tuple2<String, Matcher>> validateData(String webPageData) {
+    List<Tuple2<String, Matcher>> validateData(String webPageData) {
 //        List allPatterns = getDefaultPatterns();
 //        allPatterns.pushAll(getAdditionalPatterns());
-        //todo add the new patterns
         this.webPageData = webPageData;
         return getDefaultPatterns()
                 .flatMap(Value::toStream)
@@ -60,6 +45,13 @@ public class PatternsDelegate {
 
     }
 
+    Option<String> getNameResource(String nameResource) {
+        Matcher matcher = Pattern.compile("([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}").matcher(nameResource);
+        if (matcher.find()) {
+            return Option.of(matcher.group(0));
+        }
+        return Option.none();
+    }
 
     /**
      * @param tupleOf2 pattern name and regex

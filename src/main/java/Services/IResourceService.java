@@ -11,5 +11,5 @@ public interface IResourceService {
 
     Option<Stream<String>> readSource(String url);
 
-    boolean saveData(String data, String nameFile);
+    boolean saveData(String data, String nameFile, String nameResource);
 }

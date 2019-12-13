@@ -1,55 +1,42 @@
 package Delegate;
 
-import Services.impl.FileService;
-import io.vavr.Tuple2;
+import Services.IResourceService;
+import Services.ISourceService;
 
-import java.util.List;
 import java.util.regex.Matcher;
 
 public class DataMiningDelegate {
-    private final FileService fileService;
+
+    private final IResourceService fileService;
+    private final ISourceService internetService;
     private final PatternsDelegate patternsDelegate;
 
-    public DataMiningDelegate(FileService fileService, PatternsDelegate patternsDelegate) {
+    public DataMiningDelegate(IResourceService fileService, ISourceService internetService, PatternsDelegate patternsDelegate) {
         this.fileService = fileService;
+        this.internetService = internetService;
         this.patternsDelegate = patternsDelegate;
     }
 
     /**
-     * @param url from the file where are the urls
-     * @return list of the url
+     * @param urlResource from the file where are the urls
      */
-    public List<String> getData(String url) {
-        this.fileService.readSource(url)
-                .forEach(stringStream ->
-                        this.patternsDelegate.validateData(stringStream.toString())
-                                .map(stringMatcherTuple2 -> stringMatcherTuple2.apply(this::getResult))
-                );
-        //        java.util.List<Matcher> matchers = allPatterns.asJava()
-//                .stream()
-//                .filter(Objects::nonNull)
-//                .map(_pattern -> getMatchers(_pattern, webPageData))
-//                .filter(_matchers -> !_matchers.isEmpty())
-//                .map(Option::get)
-//                .collect(Collectors.toList());
-//
-//        matchers.stream()
-//                .map(Matcher::reset)
-//                .forEach(matcher -> {
-//                    while (matcher.find()) {
-//                        //TODO HERE I SHOULD SEND TO THE SERVICES THAT WILL BE THE WRITER
-//                        System.out.println(matcher.group(0));
-//                    }
-//                });
-        return null;
+    public void DataMining(String urlResource) {
+        this.fileService.readSource(urlResource).toJavaOptional().ifPresent(
+                dataFromResource -> dataFromResource.forEach(
+                        _urlSource -> this.internetService.dataFromSource(_urlSource)
+                                .ifPresent(
+                                        dataFromSource -> this.patternsDelegate.validateData(dataFromSource)
+                                                .map(resultTuple2 -> resultTuple2.apply((s, m) -> getResult(s, m, _urlSource)))
+                                )
+                )
+        );
     }
 
 
-    private String getResult(String s, Matcher m) {
+    private String getResult(String s, Matcher m, String urlSource) {
         m.reset();
         while (m.find()) {
-            System.out.println(s + "|" + m.group(0));
-            this.fileService.saveData(m.group(), s);
+            this.fileService.saveData(m.group(), s, patternsDelegate.getNameResource(urlSource).getOrElse("RESOURCE NAME INVALID"));
         }
         return "";
     }
